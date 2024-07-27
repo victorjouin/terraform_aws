@@ -8,7 +8,7 @@ pipeline {
     }
     agent any
     stages {
-        stage('checkout') {
+        stage('Checkout') {
             steps {
                 script {
                     dir("terraform") {
@@ -20,15 +20,13 @@ pipeline {
         stage('Plan') {
             steps {
                 sh 'terraform init'
-                sh "terraform plan -out tfplan"
+                sh 'terraform plan -out tfplan'
                 sh 'terraform show -no-color tfplan > tfplan.txt'
             }
         }
         stage('Approval') {
             when {
-                not {
-                    equals expected: true, actual: params.autoApprove
-                }
+                not { equals expected: true, actual: params.autoApprove }
             }
             steps {
                 script {
@@ -39,7 +37,7 @@ pipeline {
         }
         stage('Apply') {
             steps {
-                sh "terraform apply -input=false tfplan"
+                sh 'terraform apply -input=false tfplan'
             }
         }
     }
