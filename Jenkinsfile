@@ -11,17 +11,19 @@ pipeline {
         stage('Checkout') {
             steps {
                 script {
-                    dir("terraform") {
-                        git branch: 'main', url: "https://github.com/victorjouin/terraform_aws.git"
-                    }
+                    git branch: 'main', url: "https://github.com/victorjouin/terraform_aws.git"
                 }
             }
         }
         stage('Plan') {
             steps {
-                sh 'terraform init'
-                sh 'terraform plan -out tfplan'
-                sh 'terraform show -no-color tfplan > tfplan.txt'
+                script {
+                    dir('terraform') {
+                        sh 'terraform init'
+                        sh 'terraform plan -out tfplan'
+                        sh 'terraform show -no-color tfplan > tfplan.txt'
+                    }
+                }
             }
         }
         stage('Approval') {
@@ -37,7 +39,9 @@ pipeline {
         }
         stage('Apply') {
             steps {
-                sh 'terraform apply -input=false tfplan'
+                dir('terraform') {
+                    sh 'terraform apply -input=false tfplan'
+                }
             }
         }
     }
